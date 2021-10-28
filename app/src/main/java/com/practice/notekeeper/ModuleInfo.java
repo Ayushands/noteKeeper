@@ -3,6 +3,7 @@ package com.practice.notekeeper;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+// In DataManager line no. 137
 public final class ModuleInfo implements Parcelable {
     private final String mModuleId;
     private final String mTitle;

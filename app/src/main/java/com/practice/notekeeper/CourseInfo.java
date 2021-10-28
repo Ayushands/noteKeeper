@@ -1,12 +1,12 @@
 package com.practice.notekeeper;
 
-import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// set data to the spinner
 public final class CourseInfo implements Parcelable {
     private final String mCourseId;
     private final String mTitle;
