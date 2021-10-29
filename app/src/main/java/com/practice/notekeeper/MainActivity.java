@@ -1,10 +1,14 @@
 package com.practice.notekeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -48,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(new Intent(MainActivity.this, NoteActivity.class));
             }
         });
+
+        PreferenceManager.setDefaultValues(this,R.xml.pref_general,false);
+        PreferenceManager.setDefaultValues(this,R.xml.pref_notification,false);
+        PreferenceManager.setDefaultValues(this,R.xml.pref_data_sync,false);
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -73,6 +82,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         mNoteRecyclerAdapter.notifyDataSetChanged();
+        updateNavHeader();
+    }
+
+    private void updateNavHeader() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        TextView textUserName = headerView.findViewById(R.id.text_user_name);
+        TextView textEmailAddress = headerView.findViewById(R.id.text_email_address);
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String userName = pref.getString("user_display_name","");
+        String emailAddress = pref.getString("user_email_address","");
+
+        textUserName.setText(userName);
+        textEmailAddress.setText(emailAddress);
     }
 
     private void initializeDisplayContent() {
@@ -134,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(MainActivity.this,SettingsActivity.class));
             return true;
         }
 
@@ -157,7 +182,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_courses) {
             displayCourses();
         } else if (id == R.id.nav_share) {
-            handleSelection("Don't you think you've shared enough");
+//            handleSelection("Don't you think you've shared enough");
+            handleShare();
         } else if (id == R.id.nav_send) {
             handleSelection("Send");
         }
@@ -165,6 +191,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void handleShare() {
+        View view = findViewById(R.id.list_items);
+        Snackbar.make(view, "Share to - " +
+                PreferenceManager.getDefaultSharedPreferences(this).getString("user_favorite_social",""),
+                Snackbar.LENGTH_LONG).show();
     }
 
     private void handleSelection(String message) {
